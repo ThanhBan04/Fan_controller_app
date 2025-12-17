@@ -32,6 +32,7 @@ class MQTTClientWrapper {
   static const String topicFanState = 'iot/fan/state';
   static const String topicFanSpeed = 'iot/fan/speed';
   static const String topicFanOsc = 'iot/fan/osc';
+  static const String topicFanTimer = 'iot/fan/timer';
 
   MQTTClientWrapper({this.onMessage});
 
@@ -88,6 +89,7 @@ class MQTTClientWrapper {
       topicFanState,
       topicFanSpeed,
       topicFanOsc,
+      topicFanTimer,
     ];
 
     for (final t in topics) {
@@ -123,7 +125,9 @@ class MQTTClientWrapper {
           case topicFanOsc:
             print('Fan osc message: $message');
             break;
-
+          case topicFanTimer:
+            print('Fan timer message: $message');
+            break;
           default:
             print('Message from unknown topic: $topic');
         }
@@ -172,6 +176,10 @@ class MQTTClientWrapper {
     _publishMessage(topicFanOsc, oscState);
   }
 
+  // Gửi thời gian hẹn giờ, ví dụ: 300s
+  void publishFanTimer(String timerValue){
+    _publishMessage(topicFanTimer, timerValue);
+  }
   // Hàm publish raw nếu cần
   void publishRaw(String topic, String message) {
     _publishMessage(topic, message);
