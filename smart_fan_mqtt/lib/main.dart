@@ -155,15 +155,18 @@ class _FanHomePageState extends State<FanHomePage> {
     int minutes = int.tryParse(minuteController.text) ?? 0;
     int seconds = int.tryParse(secondController.text) ?? 0;
 
-    remainingSeconds = hours * 3600 + minutes * 60 + seconds;
-    if (remainingSeconds <= 0) return;
+    final totalSeconds = hours * 3600 + minutes * 60 + seconds;
+    if (totalSeconds <= 0) return;
+    setState(() => remainingSeconds = totalSeconds );
+    // Đẩy timer giây lên MQTT
+    mqttService.publishFanTimer(totalSeconds.toString());
 
     timer?.cancel();
     timer = Timer.periodic(const Duration(seconds: 1), (t) {
       setState(() => remainingSeconds--);
       if (remainingSeconds <= 0) {
         t.cancel();
-        _turnOffCompletely();
+        _turnOffCompletely(); // tắt quạt + pub OFF
       }
     });
   }
@@ -171,6 +174,8 @@ class _FanHomePageState extends State<FanHomePage> {
   void stopTimer() {
     timer?.cancel();
     setState(() => remainingSeconds = 0);
+    // Nhấn Stop thì gửi 0 = Không hẹn giờ
+    mqttService.publishFanTimer("0");
   }
 
   void _turnOffCompletely() {
